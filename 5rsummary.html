@@ -1,265 +1,195 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>5R Commander Pro Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .glass-card { background: white; border-radius: 1.5rem; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
-        .filter-select { background-color: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.6rem 1rem; font-size: 0.85rem; font-weight: 600; color: #475569; outline: none; transition: all 0.2s; min-width: 160px; }
-        .filter-select:focus { border-color: #10b981; background-color: #fff; ring: 2px solid #10b981; }
-        .stat-value { font-size: 2.5rem; font-weight: 800; line-height: 1; margin-bottom: 0.5rem; }
-    </style>
-</head>
-<body class="bg-slate-50 min-h-screen">
+<div id="content" style="padding: 40px 20px; max-width: 1200px; margin: auto; position: relative; font-family: 'Plus Jakarta Sans', sans-serif;">
+  
+  <style>
+      #content .glass-card { background: white; border-radius: 1rem; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+      #content .filter-select { background-color: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 1rem; font-size: 0.75rem; font-weight: 600; color: #475569; outline: none; }
+      #content .stat-val { font-size: 2rem; font-weight: 800; color: #1e293b; line-height: 1; }
+  </style>
 
-    <nav class="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-50">
-        <div class="max-w-[1600px] mx-auto flex flex-col lg:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-4">
-                <div class="bg-emerald-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg shadow-emerald-200">5R</div>
-                <div>
-                    <h1 class="text-xl font-extrabold tracking-tight text-slate-800">SUMMARY AUDIT 5R + 2S</h1>
-                    <p class="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Operational Performance Dashboard</p>
-                </div>
-            </div>
+  <h1 style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    padding: 10px 0;
+    margin: 0;
+    backdrop-filter: blur(3px);
+  ">
+    DASHBOARD AUDIT 5R
+  </h1>
 
-            <div class="flex flex-wrap gap-3 justify-center">
-                <select id="f-group" onchange="applyFilters()" class="filter-select"></select>
-                <select id="f-lokasi" onchange="applyFilters()" class="filter-box filter-select"></select>
-                <select id="f-auditor" onchange="applyFilters()" class="filter-select"></select>
-                <select id="f-bulan" onchange="applyFilters()" class="filter-select"></select>
-                <select id="f-tahun" onchange="applyFilters()" class="filter-select"></select>
-            </div>
-        </div>
-    </nav>
+  <div style="height: 60px;"></div>
 
-    <main class="max-w-[1600px] mx-auto p-8">
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="glass-card p-6 border-l-[6px] border-amber-500">
-                <p class="text-xs font-bold text-slate-400 uppercase mb-2">Avg 5R Score</p>
-                <div class="flex items-center gap-4">
-                    <span id="stat-5r" class="stat-value text-slate-800">0</span>
-                    <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded">vs Target 95</span>
-                </div>
-            </div>
-            <div class="glass-card p-6 border-l-[6px] border-red-500">
-                <p class="text-xs font-bold text-slate-400 uppercase mb-2">Avg Safety Score</p>
-                <div class="flex items-center gap-4">
-                    <span id="stat-s1" class="stat-value text-slate-800">0</span>
-                    <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded">S1 Compliance</span>
-                </div>
-            </div>
-            <div class="glass-card p-6 border-l-[6px] border-blue-500">
-                <p class="text-xs font-bold text-slate-400 uppercase mb-2">Avg Energy Score</p>
-                <div class="flex items-center gap-4">
-                    <span id="stat-s2" class="stat-value text-slate-800">0</span>
-                    <span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded">S2 Efficiency</span>
-                </div>
-            </div>
-        </div>
+  <div class="flex flex-wrap gap-2 justify-center mb-8" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 32px;">
+      <select id="f-group" onchange="applyFilters()" class="filter-select"></select>
+      <select id="f-lokasi" onchange="applyFilters()" class="filter-select"></select>
+      <select id="f-auditor" onchange="applyFilters()" class="filter-select"></select>
+      <select id="f-bulan" onchange="applyFilters()" class="filter-select"></select>
+      <select id="f-tahun" onchange="applyFilters()" class="filter-select"></select>
+  </div>
 
-        <div class="glass-card p-8 mb-8">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h3 class="font-extrabold text-slate-700 uppercase text-xs tracking-wider">Trend Skor 5R Bulanan</h3>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Monthly Actual Score vs Target 95 (Range 50-100)</p>
-                </div>
-            </div>
-            <div class="h-[300px]"><canvas id="chartTrend"></canvas></div>
-        </div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 32px;">
+      <div class="glass-card" style="padding: 20px; border-left: 8px solid #f59e0b;">
+          <p style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Avg 5R Score</p>
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+              <span id="stat-5r" class="stat-val">0</span>
+              <span style="font-size: 10px; font-weight: 800; color: #b45309; background: #fef3c7; padding: 2px 6px; border-radius: 4px;">Target 95</span>
+          </div>
+      </div>
+      <div class="glass-card" style="padding: 20px; border-left: 8px solid #ef4444;">
+          <p style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Safety Score (S1)</p>
+          <span id="stat-s1" class="stat-val">0</span>
+      </div>
+      <div class="glass-card" style="padding: 20px; border-left: 8px solid #3b82f6;">
+          <p style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Energy Score (S2)</p>
+          <span id="stat-s2" class="stat-val">0</span>
+      </div>
+  </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass-card p-6">
-                <h3 class="font-extrabold text-slate-700 uppercase text-[10px] tracking-wider mb-6">5R Score vs Target</h3>
-                <div class="h-[300px]"><canvas id="chart5R"></canvas></div>
-            </div>
+  <div class="glass-card" style="padding: 24px; margin-bottom: 32px;">
+      <h3 style="font-weight: 800; color: #334155; text-transform: uppercase; font-size: 12px; margin-bottom: 16px;">Trend Skor 5R Bulanan</h3>
+      <div style="height: 300px;"><canvas id="chartTrend"></canvas></div>
+  </div>
 
-            <div class="glass-card p-6">
-                <h3 class="font-extrabold text-slate-700 uppercase text-[10px] tracking-wider mb-6">Safety Performance (S1)</h3>
-                <div class="h-[300px]"><canvas id="chartSafety"></canvas></div>
-            </div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+      <div class="glass-card" style="padding: 24px;">
+          <h3 style="font-weight: 800; color: #334155; text-transform: uppercase; font-size: 10px; margin-bottom: 16px;">5R Score vs Target</h3>
+          <div style="height: 250px;"><canvas id="chart5R"></canvas></div>
+      </div>
+      <div class="glass-card" style="padding: 24px;">
+          <h3 style="font-weight: 800; color: #334155; text-transform: uppercase; font-size: 10px; margin-bottom: 16px;">Safety Performance (S1)</h3>
+          <div style="height: 250px;"><canvas id="chartSafety"></canvas></div>
+      </div>
+      <div class="glass-card" style="padding: 24px;">
+          <h3 style="font-weight: 800; color: #334155; text-transform: uppercase; font-size: 10px; margin-bottom: 16px;">Energy Saving (S2)</h3>
+          <div style="height: 250px;"><canvas id="chartEnergy"></canvas></div>
+      </div>
+  </div>
 
-            <div class="glass-card p-6">
-                <h3 class="font-extrabold text-slate-700 uppercase text-[10px] tracking-wider mb-6">Energy Saving (S2)</h3>
-                <div class="h-[300px]"><canvas id="chartEnergy"></canvas></div>
-            </div>
-        </div>
-    </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+      (function() {
+          const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT88wHMtZWXtIH3qMCZkLm8S7gDYV6n42v8AHrF6YRpoIMsixdG4EfTiUKe2ERQ7HuAShHSW_mvTg4T/pub?output=csv';
+          let rawData = [], colMap = {}, charts = {};
+          const monthOrder = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
 
-    <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT88wHMtZWXtIH3qMCZkLm8S7gDYV6n42v8AHrF6YRpoIMsixdG4EfTiUKe2ERQ7HuAShHSW_mvTg4T/pub?output=csv';
-        let rawData = [], colMap = {}, charts = {};
+          Papa.parse(csvUrl, {
+              download: true, header: true, skipEmptyLines: true,
+              complete: function(results) {
+                  const headers = results.meta.fields;
+                  const find = (keys) => headers.find(h => keys.some(k => h.trim().toUpperCase() === k.toUpperCase()));
+                  colMap = {
+                      group: find(['GROUP']), lokasi: find(['LOKASI', 'AREA']), auditor: find(['AUDITOR']),
+                      bulan: find(['BULAN']), tahun: find(['YEAR', 'TAHUN']), score5r: find(['5R']),
+                      s1: find(['S1']), s2: find(['S2'])
+                  };
+                  rawData = results.data.filter(d => d[colMap.group] && d[colMap.score5r]);
+                  populateFilters(rawData);
+                  applyFilters();
+              }
+          });
 
-        const monthOrder = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
+          window.populateFilters = function(data) {
+              const fill = (id, key, label, sortArr = null) => {
+                  const s = document.getElementById(id);
+                  let vals = [...new Set(data.map(d => d[key]?.trim()))].filter(v => v);
+                  if (sortArr) vals.sort((a, b) => sortArr.indexOf(a.toUpperCase()) - sortArr.indexOf(b.toUpperCase()));
+                  else vals.sort();
+                  s.innerHTML = `<option value="">SEMUA ${label}</option>`;
+                  vals.forEach(v => s.innerHTML += `<option value="${v}">${v}</option>`);
+              };
+              fill('f-group', colMap.group, 'GROUP');
+              fill('f-lokasi', colMap.lokasi, 'LOKASI');
+              fill('f-auditor', colMap.auditor, 'AUDITOR');
+              fill('f-bulan', colMap.bulan, 'BULAN', monthOrder);
+              fill('f-tahun', colMap.tahun, 'TAHUN');
+          };
 
-        Papa.parse(csvUrl, {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-                const headers = results.meta.fields;
-                const find = (keys) => headers.find(h => keys.some(k => h.trim().toUpperCase() === k.toUpperCase()));
+          window.applyFilters = function() {
+              const fG = document.getElementById('f-group').value;
+              const fL = document.getElementById('f-lokasi').value;
+              const fA = document.getElementById('f-auditor').value;
+              const fB = document.getElementById('f-bulan').value;
+              const fT = document.getElementById('f-tahun').value;
 
-                colMap = {
-                    group: find(['GROUP']),
-                    lokasi: find(['LOKASI', 'AREA']),
-                    auditor: find(['AUDITOR']),
-                    bulan: find(['BULAN']),
-                    tahun: find(['YEAR', 'TAHUN']),
-                    score5r: find(['5R']),
-                    s1: find(['S1']),
-                    s2: find(['S2'])
-                };
+              const filtered = rawData.filter(d => 
+                  (!fG || d[colMap.group]?.trim() === fG) && 
+                  (!fL || d[colMap.lokasi]?.trim() === fL) && 
+                  (!fA || d[colMap.auditor]?.trim() === fA) && 
+                  (!fB || d[colMap.bulan]?.trim() === fB) && 
+                  (!fT || d[colMap.tahun]?.trim() === fT)
+              );
+              updateDashboard(filtered);
+          };
 
-                rawData = results.data.filter(d => d[colMap.group] && d[colMap.score5r]);
-                populateFilters(rawData);
-                applyFilters();
-            }
-        });
+          function updateDashboard(data) {
+              const uniqueGroups = [...new Set(data.map(d => d[colMap.group].trim()))].sort();
+              const uniqueMonths = [...new Set(data.map(d => d[colMap.bulan].trim()))]
+                  .sort((a, b) => monthOrder.indexOf(a.toUpperCase()) - monthOrder.indexOf(b.toUpperCase()));
 
-        function populateFilters(data) {
-            const fill = (id, key, label, sortArr = null) => {
-                const s = document.getElementById(id);
-                let vals = [...new Set(data.map(d => d[key]?.trim()))].filter(v => v);
-                
-                if (sortArr) {
-                    vals.sort((a, b) => sortArr.indexOf(a.toUpperCase()) - sortArr.indexOf(b.toUpperCase()));
-                } else {
-                    vals.sort();
-                }
+              const getAvg = (filterVal, filterKey, targetKey) => {
+                  const subset = data.filter(d => d[filterKey].trim() === filterVal);
+                  if (subset.length === 0) return 0;
+                  const total = subset.reduce((s, r) => s + (parseFloat(r[targetKey]) || 0), 0);
+                  return Math.round(total / subset.length);
+              };
 
-                s.innerHTML = `<option value="">SEMUA ${label}</option>`;
-                vals.forEach(v => s.innerHTML += `<option value="${v}">${v}</option>`);
-            };
-            fill('f-group', colMap.group, 'GROUP');
-            fill('f-lokasi', colMap.lokasi, 'LOKASI');
-            fill('f-auditor', colMap.auditor, 'AUDITOR');
-            fill('f-bulan', colMap.bulan, 'BULAN', monthOrder);
-            fill('f-tahun', colMap.tahun, 'TAHUN');
-        }
+              const data5R = uniqueGroups.map(g => getAvg(g, colMap.group, colMap.score5r));
+              const dataS1 = uniqueGroups.map(g => getAvg(g, colMap.group, colMap.s1));
+              const dataS2 = uniqueGroups.map(g => getAvg(g, colMap.group, colMap.s2));
+              const trendActual = uniqueMonths.map(m => getAvg(m, colMap.bulan, colMap.score5r));
+              
+              const calcTotalAvg = (dataset) => dataset.length ? Math.round(dataset.reduce((a,b)=>a+b,0)/dataset.length) : 0;
+              document.getElementById('stat-5r').innerText = calcTotalAvg(data5R);
+              document.getElementById('stat-s1').innerText = calcTotalAvg(dataS1);
+              document.getElementById('stat-s2').innerText = calcTotalAvg(dataS2);
 
-        function applyFilters() {
-            const fG = document.getElementById('f-group').value;
-            const fL = document.getElementById('f-lokasi').value;
-            const fA = document.getElementById('f-auditor').value;
-            const fB = document.getElementById('f-bulan').value;
-            const fT = document.getElementById('f-tahun').value;
+              renderChart('chartTrend', uniqueMonths, [
+                  { label: 'SCORE', data: trendActual, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 3, pointRadius: 4, tension: 0.3 },
+                  { label: 'TARGET', data: uniqueMonths.map(() => 95), type: 'line', borderColor: '#f59e0b', borderDash: [5, 5], borderWidth: 2, pointRadius: 0 }
+              ], 'line');
 
-            const filtered = rawData.filter(d => 
-                (!fG || d[colMap.group]?.trim() === fG) && 
-                (!fL || d[colMap.lokasi]?.trim() === fL) && 
-                (!fA || d[colMap.auditor]?.trim() === fA) && 
-                (!fB || d[colMap.bulan]?.trim() === fB) && 
-                (!fT || d[colMap.tahun]?.trim() === fT)
-            );
+              renderChart('chart5R', uniqueGroups, [
+                  { label: 'ACTUAL', data: data5R, backgroundColor: '#f59e0b', borderRadius: 4 },
+                  { label: 'TARGET', data: uniqueGroups.map(() => 95), backgroundColor: '#22d3ee', borderRadius: 4 }
+              ]);
+              renderChart('chartSafety', uniqueGroups, [{ label: 'S1', data: dataS1, backgroundColor: '#ef4444', borderRadius: 4 }]);
+              renderChart('chartEnergy', uniqueGroups, [{ label: 'S2', data: dataS2, backgroundColor: '#3b82f6', borderRadius: 4 }]);
+          }
 
-            updateDashboard(filtered);
-        }
-
-        function updateDashboard(data) {
-            const uniqueGroups = [...new Set(data.map(d => d[colMap.group].trim()))].sort();
-            
-            const uniqueMonths = [...new Set(data.map(d => d[colMap.bulan].trim()))]
-                .sort((a, b) => monthOrder.indexOf(a.toUpperCase()) - monthOrder.indexOf(b.toUpperCase()));
-
-            const getAvg = (filterVal, filterKey, targetKey) => {
-                const subset = data.filter(d => d[filterKey].trim() === filterVal);
-                if (subset.length === 0) return 0;
-                const total = subset.reduce((s, r) => s + (parseFloat(r[targetKey]) || 0), 0);
-                return Math.round(total / subset.length);
-            };
-
-            const data5R = uniqueGroups.map(g => getAvg(g, colMap.group, colMap.score5r));
-            const dataS1 = uniqueGroups.map(g => getAvg(g, colMap.group, colMap.s1));
-            const dataS2 = uniqueGroups.map(g => getAvg(g, colMap.group, colMap.s2));
-            
-            const trendActual = uniqueMonths.map(m => getAvg(m, colMap.bulan, colMap.score5r));
-            const trendTarget = uniqueMonths.map(() => 95);
-
-            const calcTotalAvg = (dataset) => dataset.length ? Math.round(dataset.reduce((a,b)=>a+b,0)/dataset.length) : 0;
-            document.getElementById('stat-5r').innerText = calcTotalAvg(data5R);
-            document.getElementById('stat-s1').innerText = calcTotalAvg(dataS1);
-            document.getElementById('stat-s2').innerText = calcTotalAvg(dataS2);
-
-            renderChart('chartTrend', uniqueMonths, [
-                { 
-                    label: 'ACTUAL SCORE', 
-                    data: trendActual, 
-                    type: 'line',
-                    borderColor: '#10b981', 
-                    backgroundColor: '#10b981',
-                    borderWidth: 4,
-                    pointRadius: 6,
-                    tension: 0.3,
-                    fill: false 
-                },
-                { 
-                    label: 'TARGET', 
-                    data: trendTarget, 
-                    type: 'line',
-                    borderColor: '#f59e0b', 
-                    borderDash: [5, 5],
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: false 
-                }
-            ], 'line');
-
-            renderChart('chart5R', uniqueGroups, [
-                { label: 'ACTUAL', data: data5R, backgroundColor: '#f59e0b', borderRadius: 8 },
-                { label: 'TARGET', data: uniqueGroups.map(() => 95), backgroundColor: '#22d3ee', borderRadius: 8 }
-            ]);
-            renderChart('chartSafety', uniqueGroups, [{ label: 'S1', data: dataS1, backgroundColor: '#ef4444', borderRadius: 12 }]);
-            renderChart('chartEnergy', uniqueGroups, [{ label: 'S2', data: dataS2, backgroundColor: '#3b82f6', borderRadius: 12 }]);
-        }
-
-        function renderChart(id, labels, datasets, type = 'bar') {
-            if(charts[id]) charts[id].destroy();
-            charts[id] = new Chart(document.getElementById(id), {
-                type: type,
-                data: { labels, datasets },
-                options: {
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { 
-                            display: type === 'line',
-                            position: 'bottom',
-                            labels: { boxWidth: 12, font: { weight: 'bold' } }
-                        } 
-                    },
-                    scales: {
-                        y: { 
-                            min: 50, 
-                            max: 100, 
-                            grid: { borderDash: [5, 5], color: '#e2e8f0' }, 
-                            ticks: { font: { size: 10, weight: '600' }, color: '#94a3b8' } 
-                        },
-                        x: { grid: { display: false }, ticks: { font: { size: 9, weight: '700' }, color: '#475569' } }
-                    },
-                    animation: { duration: 1000 }
-                },
-                plugins: [type === 'bar' ? {
-                    afterDatasetsDraw(chart) {
-                        const {ctx} = chart;
-                        chart.data.datasets.forEach((dataset, i) => {
-                            chart.getDatasetMeta(i).data.forEach((bar, index) => {
-                                const val = dataset.data[index];
-                                ctx.fillStyle = i === 1 ? '#0891b2' : (type === 'line' ? '#1e293b' : '#fff');
-                                ctx.font = 'bold 9px sans-serif';
-                                ctx.textAlign = 'center';
-                                if(val > 50) ctx.fillText(val, bar.x, bar.y > 20 ? bar.y + 12 : bar.y - 5);
-                            });
-                        });
-                    }
-                } : {}]
-            });
-        }
-    </script>
-</body>
-</html>
+          function renderChart(id, labels, datasets, type = 'bar') {
+              if(charts[id]) charts[id].destroy();
+              charts[id] = new Chart(document.getElementById(id), {
+                  type: type,
+                  data: { labels, datasets },
+                  options: {
+                      maintainAspectRatio: false,
+                      plugins: { legend: { display: type === 'line', position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } },
+                      scales: {
+                          y: { min: 50, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 9 } } },
+                          x: { grid: { display: false }, ticks: { font: { size: 8, weight: '700' } } }
+                      }
+                  },
+                  plugins: [type === 'bar' ? {
+                      afterDatasetsDraw(chart) {
+                          const {ctx} = chart;
+                          chart.data.datasets.forEach((dataset, i) => {
+                              chart.getDatasetMeta(i).data.forEach((bar, index) => {
+                                  ctx.fillStyle = '#334155'; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center';
+                                  if(dataset.data[index] > 50) ctx.fillText(dataset.data[index], bar.x, bar.y - 5);
+                              });
+                          });
+                      }
+                  } : {}]
+              });
+          }
+      })();
+  </script>
+</div>
